@@ -12,3 +12,17 @@ This folder contains all the unity projects that I have worked on.
         - [RotatingRod.cs](Lab1/Assets/Scripts/Task2/RotatingRod.cs)
         - [SpiralPlatform.cs](Lab1/Assets/Scripts/Task2/SpiralPlatform.cs)
         - [Pendulum.cs](Lab1/Assets/Scripts/Task2/Pendulum.cs)
+
+### 2. Lab2: Obstacle Course
+  - [README.md](Lab2/README.md)
+  - [Assets](Lab2/Assets)
+    - [Scenes](Lab2/Assets/Scenes)
+      - [SampleScene.unity](Lab2/Assets/Scenes/SampleScene.unity)
+    - [Materials](Lab2/Assets/Materials)
+      - [FinishMaterial.mat](Lab2/Assets/Materials/FinishMaterial.mat)
+      - [BorderMaterial.mat](Lab2/Assets/Materials/BorderMaterial.mat)
+      - [PlaneMaterial.mat](Lab2/Assets/Materials/PlaneMaterial.mat)
+      - [PlayerMaterial.mat](Lab2/Assets/Materials/PlayerMaterial.mat)
+    - [Scripts](Lab2/Assets/Scripts)
+      - [Finish.cs](Lab2/Assets/Scripts/Finish.cs)
+      - [Player.cs](Lab2/Assets/Scripts/Player.cs)
