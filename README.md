@@ -26,3 +26,16 @@ This folder contains all the unity projects that I have worked on.
     - [Scripts](Lab2/Assets/Scripts)
       - [Finish.cs](Lab2/Assets/Scripts/Finish.cs)
       - [Player.cs](Lab2/Assets/Scripts/Player.cs)
+
+### 3. MKR1: Bicycle Scene
+  - [README.md](MKR1/README.md)
+  - [Assets](MKR1/Assets)
+    - [Bicycle.fbx](MKR1/Assets/Objects/Bicycle.fbx)
+    - [Scenes](MKR1/Assets/Scenes)
+      - [Task2.unity](MKR1/Assets/Scenes/Task2.unity)
+      - [Task3.unity](MKR1/Assets/Scenes/Task3.unity)
+    - [Scripts](MKR1/Assets/Scripts)
+      - [Task2](MKR1/Assets/Scripts/Task2)
+        - [NormalizingSumVectors.cs](MKR1/Assets/Scripts/Task2/NormalizingSumVectors.cs)
+      - [Task3](MKR1/Assets/Scripts/Task3)
+        - [BicycleController.cs](MKR1/Assets/Scripts/Task3/BicycleController.cs)
