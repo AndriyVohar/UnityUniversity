@@ -26,11 +26,8 @@ public class GlobalStorage : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            if (!Directory.Exists(Application.persistentDataPath))
-            {
-                Directory.CreateDirectory(Application.persistentDataPath);
-            }
             savePath = Path.Combine(Application.persistentDataPath, "saveData.json");
+            Debug.Log("Save path: " + savePath);
             LoadData();
         }
         else

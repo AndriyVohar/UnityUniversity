@@ -4,10 +4,10 @@ public class Player : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
-    public bool isGrounded = true;
     public float boostSpeed = 10f;
     public float boostDuration = 0.1f;
-    
+
+    private bool isGrounded = true;
     private bool isBoosting = false;
     private float boostEndTime;
 
@@ -37,32 +37,38 @@ public class Player : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
         }
-        
+
         if (collision.gameObject.CompareTag("Box"))
         {
             GlobalStorage.Instance.data.lives--;
+            GlobalStorage.Instance.data.collisions++;
             Debug.Log("Player hit! Lives remaining: " + GlobalStorage.Instance.data.lives);
 
-            if (Lives.lives <= 0)
+            if (GlobalStorage.Instance.data.lives <= 0)
             {
-                UnityEditor.EditorApplication.isPlaying = false;
+                #if UNITY_EDITOR
+                    UnityEditor.EditorApplication.isPlaying = false;
+                #else
+                    Application.Quit();
+                #endif
             }
         }
 
         if (collision.gameObject.CompareTag("Money"))
         {
+            GlobalStorage.Instance.data.coinsCollected++;
             GlobalStorage.Instance.data.lives++;
             Destroy(collision.gameObject);
         }
     }
 
-    void OnCollisionExit(Collision collision)
+    private void OnCollisionExit(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
