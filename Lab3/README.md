@@ -1,107 +1,96 @@
-# Lab2. Завдання: Полоса перешкод
+# Lab3. Полоса перешкод з системою прогресу
+
+## Опис проекту
+Цей проект представляє собою 3D-гру "Полоса перешкод", де гравець керує персонажем, який повинен дістатися фінішу, уникаючи перешкод, збираючи монети та вкладаючись у відведений час. Проект демонструє використання паттерна Singleton, системи подій, збереження даних у JSON та базову механіку ігрової сесії.
 
 ## Структура проекту
 
 ```
-Lab2
-├── Assets
-│   ├── Scenes
-│   │   └── SampleScene.unity
-│   ├── Materials
-│   │   ├── FinishMaterial.mat
-│   │   ├── BorderMaterial.mat
-│   │   ├── PlaneMaterial.mat
-│   │   └── PlayerMaterial.mat
-│   └── Scripts
-│       ├── Finish.cs
-│       └── Player.cs
-├── .gitignore
+Assets/
+  ├─ Scripts/
+  │   ├─ Player.cs              - Логіка руху гравця та обробка колізій
+  │   ├─ GlobalStorage.cs       - Глобальне сховище даних (Singleton)
+  │   ├─ Lives.cs               - Відображення життів на інтерфейсі
+  │   ├─ Finish.cs              - Обробка досягнення фінішу
+  │   └─ TimerController.cs     - Контроль часу рівня
 ```
 
-## Опис
-Цей проект містить рівень гри «Полоса перешкод», який складається з рухомого головного героя та перешкод:
-1. **Головний герой** – рухається вперед із постійною швидкістю, може рухатися вліво-вправо, стрибати та прискорюватися.
-2. **Перешкоди** – коробки.
-3. **Фініш** – сіро-чорна площина.
+## Реалізовані функціональності
 
-## Завдання
-1. Реалізувати рух головного героя вздовж полоси з постійною швидкістю.
-2. Реалізувати можливості руху вліво-вправо.
-3. Доповнити полосу перешкодами.
-4. Доповнити полосу фінішом.
-5. Реалізувати можливість перестрибувати перешкоди.
-6. Реалізувати прискорення героя, яке не може тривати більше `n` секунд.
+### 1. Монети та пастки
+- **Монети**: При зіткненні з монетою, гравець отримує +1 життя, а монета зникає
+- **Пастки (коробки)**: При зіткненні з пасткою, гравець втрачає одне життя
 
-### Code Snippets
+### 2. Глобальне сховище даних (Singleton)
+- Зберігає:
+- Таблицю рекордів
+- Кількість життів
+- Кількість зіткнень з пастками
+- Час від запуск**у рівня
+- Кількість зібраних монет**
 
+### 3. Збереження даних
+- Формат: JSON
+- Збереження: При виході з гри
+- Завантаження: При запуску гри
+
+### 4. Система життів та програшу
+- Початкова кількість життів: 3
+- При зіткненні з пасткою: -1 життя
+- При зібранні монети: +1 життя
+- При досягненні 0 життів: програш
+
+### 5. Обмеження часу
+- Визначений час на проходження рівня
+- При вичерпанні часу: програш
+
+## Приклади реалізації
+
+### Глобальне сховище (Singleton)
 ```csharp
-// Player.cs
-using UnityEngine;
-
-public class Player : MonoBehaviour
+public class GlobalStorage : MonoBehaviour
 {
-    public float speed = 5f;
-    public float jumpForce = 5f;
-    public float acceleration = 2f;
-    public float maxAccelerationTime = 2f;
-    private float accelerationTime = 0f;
-    private Rigidbody rb;
+    public static GlobalStorage Instance { get; private set; }
 
-    void Start()
-    {
-        rb = GetComponent<Rigidbody>();
-    }
+    public RecordData data = new RecordData();
+    private string savePath;
 
-    void Update()
+    private void Awake()
     {
-        Move();
-        Jump();
-        Accelerate();
-    }
-
-    void Move()
-    {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, 1.0f);
-        rb.velocity = movement * speed;
-    }
-
-    void Jump()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Instance == null)
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        }
-    }
-
-    void Accelerate()
-    {
-        if (Input.GetKey(KeyCode.LeftShift) && accelerationTime < maxAccelerationTime)
-        {
-            speed += acceleration * Time.deltaTime;
-            accelerationTime += Time.deltaTime;
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            savePath = Path.Combine(Application.persistentDataPath, "saveData.json");
+            LoadData();
         }
         else
         {
-            speed = 5f;
-            accelerationTime = 0f;
+            Destroy(gameObject);
         }
     }
+    
+    // Методи збереження та завантаження даних...
 }
 ```
 
+### Обробка зіткнень та збір монет
 ```csharp
-// Finish.cs
-using UnityEngine;
-
-public class Finish : MonoBehaviour
+private void OnCollisionEnter(Collision collision)
 {
-    void OnTriggerEnter(Collider other)
+    if (collision.gameObject.CompareTag("Ground"))
     {
-        if (other.CompareTag("Player"))
+        isGrounded = true;
+    }
+
+    if (collision.gameObject.CompareTag("Box"))
+    {
+        GlobalStorage.Instance.data.lives--;
+        GlobalStorage.Instance.data.collisions++;
+        Debug.Log("Player hit! Lives remaining: " + GlobalStorage.Instance.data.lives);
+
+        if (GlobalStorage.Instance.data.lives <= 0)
         {
-            Debug.Log("You win!");
-            
             #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
             #else
@@ -109,5 +98,48 @@ public class Finish : MonoBehaviour
             #endif
         }
     }
+
+    if (collision.gameObject.CompareTag("Money"))
+    {
+        GlobalStorage.Instance.data.coinsCollected++;
+        GlobalStorage.Instance.data.lives++;
+        Destroy(collision.gameObject);
+    }
 }
 ```
+
+### Система таймера
+```csharp
+void Update()
+{
+    if (isGameOver) return;
+
+    remainingTime -= Time.deltaTime;
+
+    if (timerText != null)
+    {
+        timerText.text = "Time: " + Mathf.CeilToInt(remainingTime).ToString();
+    }
+
+    if (remainingTime <= 0)
+    {
+        GameOver();
+    }
+}
+
+void GameOver()
+{
+    isGameOver = true;
+    Debug.Log("Час вичерпано! Програш.");
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+    #else
+        Application.Quit();
+    #endif
+}
+```
+
+## Керування
+- **W/A/S/D** або **Стрілки**: Рух персонажа
+- **Пробіл**: Стрибок
+- **Shift**: Тимчасове прискорення
